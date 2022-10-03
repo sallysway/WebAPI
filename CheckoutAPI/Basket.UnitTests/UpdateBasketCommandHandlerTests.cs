@@ -23,8 +23,12 @@ namespace Basket.UnitTests
         public async Task Basket_Is_Updated_With_New_Values()
         {
             //Arrange
+            var basketId = 123;
             var basketInput = new BasketInput { Customer = "John Smith", PaysVAT = true, Status = Status.Closed };
-            var updateBasketCommand = new UpdateBasketCommand { Id = 123, BasketInput = basketInput };
+            var updateBasketCommand = new UpdateBasketCommand { Id = basketId, BasketInput = basketInput };
+            var foundBasket = new Application.Entities.Basket { Id = basketId };
+            _mockRepository.Setup(r => r.GetBasketAsync(It.Is<int>(i => i == basketId), CancellationToken.None))
+                .ReturnsAsync(foundBasket);
 
             //Act
             await _updateBasketCommandHandler.Handle(updateBasketCommand, CancellationToken.None);

@@ -23,17 +23,19 @@ namespace Basket.UnitTests
             //Arrange
             var basketId = 123;
             var query = new GetBasketContentQuery { Id = basketId };
-            var articles = _fixture.CreateMany<Article>(5).ToList();
-            var foundBasket = new Application.Entities.Basket { Id = basketId, Articles = articles };
+            var articles = _fixture.CreateMany<BasketArticle>(5).ToList();
+            var foundBasket = new Application.Entities.Basket { Id = basketId};
             _repositoryMock.Setup(r => r.GetBasketAsync(It.Is<int>(i => i == basketId), CancellationToken.None))
                 .ReturnsAsync(foundBasket);
+            _repositoryMock.Setup(r => r.GetArticles(It.Is<int>(i => i == basketId), CancellationToken.None))
+               .ReturnsAsync(articles);
 
             //Act
             var result = await _getBasketQueryHandler.Handle(query, CancellationToken.None);
 
             //Assert
             Assert.NotNull(result);
-            Assert.Equal(1, result.Id);
+            Assert.Equal(basketId, result.Id);
             Assert.Equal(articles.Count(), result.Articles.Count());
         }
     }
